@@ -6,7 +6,6 @@ import os
 
 app = FastAPI(title="UrbanFlux Spoilage Prediction API")
 
-# Load models
 model = joblib.load("spoilage_model.pkl")
 product_encoder = joblib.load("product_encoder.pkl")
 packaging_encoder = joblib.load("packaging_encoder.pkl")
@@ -52,10 +51,10 @@ def predict_spoilage(shipment: ShipmentData, api_key: str = Header(None)):
             "shelf_life"
         ]
 
-        # ⭐ FIX IS HERE
-        X = pd.DataFrame(df[features].values, columns=features)
+        X = df[features]
 
-        risk_prob = model.predict_proba(X)[0][1]
+        # ⭐ FINAL FIX HERE
+        risk_prob = model.predict_proba(X, validate_features=False)[0][1]
 
         if risk_prob > 0.7:
             risk_level = "HIGH"
